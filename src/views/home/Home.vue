@@ -1,7 +1,11 @@
 <template>
   <div class="home">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
-    <div class="content">
+    <scroll class="content" ref="scroll"
+      :probe-type="3"
+      :pull-up-load="true"
+      @scroll="contentScroll"
+      >
       <div>
         <home-swiper :banners="banners"></home-swiper>
         <recommend-view :recommends="recommends"></recommend-view>
@@ -12,60 +16,11 @@
           >
         </tab-control>
         <goods-list :goods="showGoods"></goods-list>
-        <!-- <ul>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-          <li>消息</li>
-        </ul> -->
+        
       </div>
-    </div>
+    </scroll>
+    <!-- click.native -->
+    <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
   </div>
 </template>
 
@@ -76,8 +31,11 @@ import RecommendView from "./childComps/RecommendView"
 import FeatureView from "../home/childComps/FeatureView"
 import TabControl from "../../components/content/tabControl/TabControl"
 import GoodsList from "../../components/content/goods/GoodsList"
+import Scroll from "../../components/common/scroll/Scroll"
+import BackTop from "../../components/content/backtop/BackTop"
 
 import { getHomeMultiData, BANNER, RECOMMEND, getGoods} from "../../network/home"
+import { BACKTOP_DISTANCE } from "../../common/const"
 
 export default {
   name: 'Home',
@@ -87,7 +45,9 @@ export default {
     RecommendView,
     FeatureView,
     TabControl,
-    GoodsList
+    GoodsList,
+    Scroll,
+    BackTop
   },
   
   data() {
@@ -99,7 +59,8 @@ export default {
         'new': {page: 0, list: []},
         'sell': {page: 0, list: []}
       },
-      currentType: 'pop'
+      currentType: 'pop',
+      isShowBackTop: false
     }
   },
   created(){
@@ -132,7 +93,7 @@ export default {
       //默认获取第一页数据
       const page = this.goods[type].page + 1
       getGoods(type, page).then(res => {
-        console.log(res);
+        // console.log(res);
         this.goods[type].list.push(...res.data.list)
         this.goods[type].page += 1
       })
@@ -153,6 +114,13 @@ export default {
           break
       }
       this.$refs.tabControl.currentIndex = index
+    },
+    contentScroll(position) {
+      // console.log(position);
+      this.isShowBackTop = (-position.y) > BACKTOP_DISTANCE
+    },
+    backClick() {
+      this.$refs.scroll.scrollTo(0,0)
     }
   }
 
@@ -162,6 +130,7 @@ export default {
 <style scoped>
 .home{
   height: 100vh;
+  position: relative;
   /* padding-top: 44px; */
 }
 .home-nav{
@@ -177,17 +146,17 @@ export default {
 }
 .content{
   
-  /* height: calc(100% - 88px); */
+  height: calc(100% - 88px);
   position: absolute;
   top: 44px;
   bottom: 44px;
   left: 0;
   right: 0;
   overflow: hidden;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
 }
 .tab-control{
-  position: sticky;
+  /* position: sticky; */
   top: 0;
   z-index: 9;
 }
