@@ -5,6 +5,7 @@
       :probe-type="3"
       :pull-up-load="true"
       @scroll="contentScroll"
+      @pullingUp="loadMore"
       >
       <div>
         <home-swiper :banners="banners"></home-swiper>
@@ -19,6 +20,7 @@
         
       </div>
     </scroll>
+    <!-- 不能直接监听组件 -->
     <!-- click.native -->
     <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
   </div>
@@ -96,6 +98,9 @@ export default {
         // console.log(res);
         this.goods[type].list.push(...res.data.list)
         this.goods[type].page += 1
+
+        //结束上拉加载更多
+        this.$refs.scroll.finishPullUp()
       })
     },
     /**
@@ -121,6 +126,10 @@ export default {
     },
     backClick() {
       this.$refs.scroll.scrollTo(0,0)
+    },
+    loadMore() {
+      this.getHomeGoods(this.currentType)
+      this.$refs.scroll.scroll.refresh()
     }
   }
 

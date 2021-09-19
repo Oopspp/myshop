@@ -40,11 +40,23 @@ export default {
       this.$emit("scroll", position);
     });
     }
+    //监听上拉事件
+    if(this.probeType) {
+      this.scroll.on('pullingUp', () => {
+        this.$emit('pullingUp')
+      })
+    }
   },
   methods: {
     scrollTo(x,y,time=300){
       this.scroll && this.scroll.scrollTo && this.scroll.scrollTo(x, y, time)
     },
+    finishPullUp() {
+      this.scroll.finishPullUp()
+    },
+    refresh() {
+      this.scroll && this.scroll.refresh()
+    }
   }
 };
 </script>
