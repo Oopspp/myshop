@@ -20,7 +20,7 @@
         
       </div>
     </scroll>
-    <!-- 不能直接监听组件 -->
+    <!-- 不能直接监听组件  -->
     <!-- click.native -->
     <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
   </div>
@@ -77,6 +77,16 @@ export default {
     showGoods() {
       return this.goods[this.currentType].list
     }
+  },
+  mounted() {
+    // const refresh = debounce(this.$refs.scroll.refresh)
+    const refresh = this.$refs.scroll.refresh
+    // 监听item中图片加载完成
+    this.$bus.$on('itemImageLoad', () => {
+      refresh()
+    })
+    //吸顶效果
+    // console.log(this.$refs.tabControl.$el.offsetTop)
   },
   methods: {
     /**
