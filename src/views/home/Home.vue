@@ -1,6 +1,12 @@
 <template>
   <div class="home">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
+    <tab-control class="tab-control"
+                :titles="['流行','新款','精选']" 
+                @tabClick="tabclick"
+                ref="tabControl2"
+                v-show="isTabFixed">
+    </tab-control>              
     <scroll class="content" ref="scroll"
       :probe-type="3"
       :pull-up-load="true"
@@ -8,13 +14,12 @@
       @pullingUp="loadMore"
       >
       <div>
-        <home-swiper :banners="banners"></home-swiper>
+        <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad"></home-swiper>
         <recommend-view :recommends="recommends"></recommend-view>
         <feature-view></feature-view>
         <tab-control :titles="['流行','新款','精选']" 
                       @tabClick="tabclick"
-                      ref="tabControl"
-          >
+                      ref="tabControl1">
         </tab-control>
         <goods-list :goods="showGoods"></goods-list>
         
@@ -63,7 +68,9 @@ export default {
         'sell': {page: 0, list: []}
       },
       currentType: 'pop',
-      isShowBackTop: false
+      isShowBackTop: false,
+      isTabFixed: false,
+      tabOffsetTop: 0
     }
   },
   created(){
@@ -130,11 +137,13 @@ export default {
           this.currentType = 'sell'
           break
       }
-      this.$refs.tabControl.currentIndex = index
+      this.$refs.tabControl1.currentIndex = index
+      this.$refs.tabControl2.currentIndex = index
     },
     contentScroll(position) {
       // console.log(position);
       this.isShowBackTop = (-position.y) > BACKTOP_DISTANCE
+      this.isTabFixed = (-position.y) > this.tabOffsetTop
     },
     backClick() {
       this.$refs.scroll.scrollTo(0,0)
@@ -142,6 +151,11 @@ export default {
     loadMore() {
       this.getHomeGoods(this.currentType)
       this.$refs.scroll.scroll.refresh()
+    },
+    swiperImageLoad() {
+      //通过$el获取组件内元素的offsetTop值
+      console.log(this.$refs.tabControl1.$el.offsetTop);
+      this.tabOffsetTop = this.$refs.tabControl1.$el.offsetTop
     }
   }
 
@@ -177,8 +191,8 @@ export default {
   /* overflow-y: scroll; */
 }
 .tab-control{
-  /* position: sticky; */
-  top: 0;
+  position: sticky;
+  top: 44px;
   z-index: 9;
 }
 </style>
