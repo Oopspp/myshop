@@ -38,6 +38,7 @@ import BackTop from "../../components/content/backtop/BackTop"
 
 import { getHomeMultiData, BANNER, RECOMMEND, getGoods} from "../../network/home"
 import { BACKTOP_DISTANCE } from "../../common/const"
+import { debounce } from "../../common/util"
 
 export default {
   name: 'Home',
@@ -79,8 +80,9 @@ export default {
     }
   },
   mounted() {
-    // const refresh = debounce(this.$refs.scroll.refresh)
-    const refresh = this.$refs.scroll.refresh
+    //不能传'refresh()' 不能加括号 
+    const refresh = debounce(this.$refs.scroll.refresh)
+    // const refresh = this.$refs.scroll.refresh
     // 监听item中图片加载完成
     this.$bus.$on('itemImageLoad', () => {
       refresh()
